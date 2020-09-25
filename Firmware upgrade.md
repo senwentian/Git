@@ -3,7 +3,7 @@
 
 有时我们开发了新的功能，希望给已经在运行的设备进行固件升级。但很可能因为电路板已经被安装了外壳等原因而不能方便地使用下载器将新的固件烧录到设备，此时将需要使用 OTA (over-the-air) 升级功能。
 
-本节将实现 ESP32 从指定的 URL 来更新固件的功能。如需查看相关代码，请前往 ``components/OTA`` 目录。
+本节将实现 ESP32 从指定的 URL 来更新固件的功能。如需查看相关代码，请前往 ``example/intelligentg-vehicle/components/OTA`` 目录。
 
 
 Flash 分区
@@ -98,7 +98,7 @@ OTA 固件升级过程中，状态变更如图所示：
 
 使用本示例之前需要配置一个 URL 链接，在 `menuconfig `中的 ``Intelligent Vehicle Configuration  ---> Example Configuration  ---> firmware upgrade url endpoint`` 进行配置。
 
-示例中使用的是本地的 http server，所以这里的 IP 地址需改成本机的。
+示例中使用的是本地的 http server，所以这里的 IP 地址需改成用户PC端的 IP 地址。
 
 
 演示
