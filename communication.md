@@ -1,11 +1,3 @@
-
-
->用户可以通过在`menuconfig`中选择控制模式来进行对小车的控制
->
->１.通过扫描二维码配网，使PC和ESP-Intelligent-Vehicle处于同一个Wi-Fi局域网之内，通过建立TCP连接来使用户控制该智能小车
->
->２.通过支持SBUS通讯协议的遥控器来对该智能小车进行控制
-
 ## 通信层级结构
 
 |||||
@@ -15,6 +7,12 @@
 |协议层|IP |IP |SBUS |
 |传输层|TCP|TCP||
 |物理层|Wi-Fi STA (Station)|Wi-Fi STA (Station)||
+
+> 用户可以通过在`menuconfig`中选择控制模式来进行对小车的控制
+>
+> １.通过扫描二维码配网，使PC和ESP-Intelligent-Vehicle处于同一个Wi-Fi局域网之内，通过建立TCP连接来使用户控制该智能小车
+>
+> ２.通过支持SBUS通讯协议的遥控器来对该智能小车进行控制
 
 ## Wi-Fi 通信
 
@@ -214,6 +212,32 @@ switch(event.type) {
 ```
 
 以上是uart_recieve_task()任务接受sbus数据帧的部分代码
+
+根据协议解析，通过switch case来匹配起始字节和结束字节，只有起始字节和结束字节分别符合协议规定的0x0F和0x00，才能进一步对接收到的数据帧进行协议转换
+
+```c
+void SBUS_Decode(void)
+{
+	SBUS_ChanelVal[0]  = ((SBUS_MsgPack[1]		| SBUS_MsgPack[2] << 8)	& 0x07FF);
+	SBUS_ChanelVal[1]  = ((SBUS_MsgPack[2] >> 3	| SBUS_MsgPack[3] << 5)	& 0x07FF);
+	SBUS_ChanelVal[2]  = ((SBUS_MsgPack[3] >> 6	| SBUS_MsgPack[4] << 2 | SBUS_MsgPack[5] << 10)	& 0x07FF);
+	SBUS_ChanelVal[3]  = ((SBUS_MsgPack[5] >> 1	| SBUS_MsgPack[6] << 7)	& 0x07FF);
+	SBUS_ChanelVal[4]  = ((SBUS_MsgPack[6] >> 4	| SBUS_MsgPack[7] <<4)	& 0x07FF);
+	SBUS_ChanelVal[5]  = ((SBUS_MsgPack[7] >> 7	| SBUS_MsgPack[8] << 1 | SBUS_MsgPack[9] << 9)	& 0x07FF);
+	SBUS_ChanelVal[6]  = ((SBUS_MsgPack[9] >> 2	| SBUS_MsgPack[10] << 6)	& 0x07FF);
+	SBUS_ChanelVal[7]  = ((SBUS_MsgPack[10] >> 5	| SBUS_MsgPack[11] << 3)	& 0x07FF);
+	SBUS_ChanelVal[8]  = ((SBUS_MsgPack[12]		| SBUS_MsgPack[13] << 8)	& 0x07FF);
+	SBUS_ChanelVal[9]  = ((SBUS_MsgPack[13] >> 3	| SBUS_MsgPack[14]<<5)	& 0x07FF);
+	SBUS_ChanelVal[10] = ((SBUS_MsgPack[14] >> 6	| SBUS_MsgPack[15]<<2 | SBUS_MsgPack[16] << 10)	& 0x07FF);
+	SBUS_ChanelVal[11] = ((SBUS_MsgPack[16] >> 1	| SBUS_MsgPack[17]<<7)	& 0x07FF);
+	SBUS_ChanelVal[12] = ((SBUS_MsgPack[17] >> 4	| SBUS_MsgPack[18]<<4)	& 0x07FF);
+	SBUS_ChanelVal[13] = ((SBUS_MsgPack[18] >> 7	| SBUS_MsgPack[19]<<1 | SBUS_MsgPack[20]<<9)	& 0x07FF);
+	SBUS_ChanelVal[14] = ((SBUS_MsgPack[20] >> 2	| SBUS_MsgPack[21]<<6)	& 0x07FF);
+	SBUS_ChanelVal[15] = ((SBUS_MsgPack[21] >> 5	| SBUS_MsgPack[22]<<3)	& 0x07FF);
+}
+```
+
+
 
 具体请参考`example/intelligent-vehicle/component/Peripherals/user_uart.c`以及``example/intelligent-vehicle/component/drive-control/user_sbus.c`
 
