@@ -61,7 +61,7 @@ git clone ssh://git@glab.espressif.cn:8266/intern-porjects/esp-intelligent-vehic
 * 硬件驱动按照硬件接口进行划分，包括 CAN 设备、PWM 设备、UART 设备等。
 * 依赖库包括 ESP-IDF 提供的默认组件。
 
-**代码文件结构如下所示：![intelligent-vehicle_file_structure](/home/espressif/tsw/md/_static/intelligent-vehicle_file_structure.png)**
+**代码文件结构如下所示：![intelligent-vehicle_file_structure](_static/intelligent-vehicle_file_structure.png)**
 
 ```txt
 ├── External components                              | 外部项目组件目录
