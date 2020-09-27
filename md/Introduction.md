@@ -39,7 +39,7 @@ ESP-Intelligent-Vehicle 是乐鑫推出的基于 ESP32 开发的wifi智能小车
 
 使用 ESP32 开发产品时，常用的开发环境如下图所示：
 
-![dev_setup](/home/espressif/tsw/_static/dev_setup.png)
+![dev_setup](_static/dev_setup.png)
 
 ​                                                                                                    ESP32 产品开发过程
 
@@ -77,7 +77,7 @@ ESP-IDF 是乐鑫为 ESP32 提供的物联网开发框架。
 
 ESP-IDF 采用了一种基于组件的架构：
 
-![idf_comp](/home/espressif/tsw/_static/idf_comp.png)                
+![idf_comp](_static/idf_comp.png)                
 
 
 
@@ -90,7 +90,7 @@ ESP-IDF 中的所有软件均以“组件”的形式提供，比如操作系统
 
 开发人员通常借助 ESP-IDF 构建 *应用程序*，包含业务逻辑、外设驱动程序和 SDK 配置。
 
-![app_structure](/home/espressif/tsw/_static/app_structure.png)
+![app_structure](_static/app_structure.png)
 
 ​                                                                                                                       应用程序架构
 
@@ -107,3 +107,32 @@ ESP-IDF 中的所有软件均以“组件”的形式提供，比如操作系统
 > 更多关于工程结构和编译过程的细节，请参阅 编程指南/构建系统 <https://docs.espressif.com/projects/esp-idf/zh_CN/v4.0/api-guides/build-system.html#component-directories>_。
 
 
+
+## ESP-IDF 环境搭建
+
+请参照 [ESP-IDF 编程指南](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32s2/get-started/index.html)，按照步骤设置 ESP-IDF。
+
+注意事项：
+
+* 请完成链接页面的所有步骤。
+* 请按照上面链接中的步骤构建一个或多个示例应用程序。
+
+## ESP32 链接脚本修改
+
+打开 ESP32的链接脚本模板 `${IDF_PATH}/components/esp32/ld/esp32.project.ld.in`，将以下代码添加到 `.flash.rodata` 段的末尾。
+
+```
+   /* Parameters and log system data */
+    _param_start = .;
+    KEEP(*(.param))
+    KEEP(*(.param.*))
+    _param_stop = .;
+    . = ALIGN(4);
+    _log_start = .;
+    KEEP(*(.log))
+    KEEP(*(.log.*))
+    _log_stop = .;
+    . = ALIGN(4);
+```
+
+以上代码可以实现将具有 `.param.*` 或 `.log.*` 段属性的变量，放置在连续的存储区域，从而加快变量遍历速度。

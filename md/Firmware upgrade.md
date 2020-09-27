@@ -13,7 +13,7 @@ Flash 分区
 
 在 ESP32 的应用中，通常包含多种不同类型的数据，因此通过分区表将 flash 划分为多个逻辑分区。具体结构如下：
 
-![flash_partitions_intro](/home/espressif/tsw/_static/flash_partitions_intro.png)
+![flash_partitions_intro](_static/flash_partitions_intro.png)
 
 ​                                                                              Flash 分区结构
 
@@ -40,7 +40,7 @@ Flash 分区
 
 在这个分区表中，指定了两个 1600 KB 大小的应用程序分区，足够存放我们待升级的固件。
 
-![flash_partitions_upgrade](/home/espressif/tsw/_static/flash_partitions_upgrade.png)
+![flash_partitions_upgrade](_static/flash_partitions_upgrade.png)
 
  																	  OTA Flash 分区
 
@@ -106,7 +106,7 @@ OTA 固件升级过程中，状态变更如图所示：
 
 本示例中的升级过程如下图所示：
 
-![ota_workflow](/home/espressif/tsw/_static/ota_workflow.png)
+![ota_workflow](_static/ota_workflow.png)
 
 ​                                                                               OTA 升级过程
 
