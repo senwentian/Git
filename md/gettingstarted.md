@@ -63,7 +63,7 @@ git clone ssh://git@glab.espressif.cn:8266/intern-porjects/esp-intelligent-vehic
 
 **代码文件结构如下所示：![intelligent-vehicle_file_structure](_static/intelligent-vehicle_file_structure.png)**
 
-```txt
+```c
 ├── External components                              | 外部项目组件目录
 │   ├── esp32-camera                                     | camera组件
 │   │   ├── conversions                                  | 帧格式转换组件 
