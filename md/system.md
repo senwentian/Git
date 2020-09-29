@@ -1,3 +1,13 @@
+**9月29日总结**
+
+前几天晚上抽时间将一个简单的机械臂做完了，因为晚上时间和马上要进行的机器人比赛有一点冲突，可能做的比较粗糙，只有两个自由度
+
+今天早上带过来进行了调试，搬运和放下动作都已经修改完成
+
+之后继续完善system文档，预计明天再将摄像头和TCP控制命令文档方面写完
+
+准备最近再抽时间用3D打印机给开发板做个支撑件放在车上
+
 # 智能小车系统
 
 ## 系统启动流程
@@ -59,20 +69,20 @@ TASK 具体描述如下：
 ```c
 #define configBASE_STACK_SIZE CONFIG_BASE_STACK_SIZE
 //Task stack sizes
-#define SLOW_FREQUENCY_TASK_STACKSIZE         (500)
-#define FAST_FREQUENCY_TASK_STACKSIZE            (500)
-#define OTA_TASK_STACKSIZE             (8 * configBASE_STACK_SIZE)
-#define CREAT_TASK_STACKSIZE        (4 * configBASE_STACK_SIZE)
-#define TEST_TASK_STACKSIZE        (2* configBASE_STACK_SIZE)
-#define CONTROL_TASK_STACKSIZE     (3 * configBASE_STACK_SIZE)
-#define CAN_RECIEVE_TASK_STACKSIZE            (2*configBASE_STACK_SIZE)
-#define TCP_RECIEVE_TASK_STACKSIZE            (2 * configBASE_STACK_SIZE)
-#define QRCODE_PARSE_SEND_TASK_STACKSIZE          (2 * configBASE_STACK_SIZE)
-#define SEND_CURRENT_TASK_STACKSIZE        (3 * configBASE_STACK_SIZE)
-#define MCPWM_SERVO_CONTROL_TASK_STACKSIZE     (2 * configBASE_STACK_SIZE)
-#define UART_RECIEVE_TASK_STACKSIZE     (3 * configBASE_STACK_SIZE)
-#define QR_CODE_INFO_TASK_STACKSIZE       (64 * configBASE_STACK_SIZE)
-#define REMOTE_CONTROL_TASK_STACKSIZE        (2 * configBASE_STACK_SIZE)
+#define SLOW_FREQUENCY_TASK_STACKSIZE       (500)
+#define FAST_FREQUENCY_TASK_STACKSIZE       (500)
+#define OTA_TASK_STACKSIZE                (8 * configBASE_STACK_SIZE)
+#define CREAT_TASK_STACKSIZE              (4 * configBASE_STACK_SIZE)
+#define TEST_TASK_STACKSIZE                (2* configBASE_STACK_SIZE)
+#define CONTROL_TASK_STACKSIZE            (3 * configBASE_STACK_SIZE)
+#define CAN_RECIEVE_TASK_STACKSIZE          (2*configBASE_STACK_SIZE)
+#define TCP_RECIEVE_TASK_STACKSIZE        (2 * configBASE_STACK_SIZE)
+#define QRCODE_PARSE_SEND_TASK_STACKSIZE  (2 * configBASE_STACK_SIZE)
+#define SEND_CURRENT_TASK_STACKSIZE       (3 * configBASE_STACK_SIZE)
+#define MCPWM_SERVO_CONTROL_TASK_STACKSIZE(2 * configBASE_STACK_SIZE)
+#define UART_RECIEVE_TASK_STACKSIZE      (3 * configBASE_STACK_SIZE)
+#define QR_CODE_INFO_TASK_STACKSIZE     (64 * configBASE_STACK_SIZE)
+#define REMOTE_CONTROL_TASK_STACKSIZE    (2 * configBASE_STACK_SIZE)
 ```
 
 ### 任务优先级配置
@@ -81,20 +91,20 @@ TASK 具体描述如下：
 
 ```c
 // Task priorities. Higher number higher priority
-#define SLOW_FREQUENCY_TASK_PRI     6
-#define FAST_FREQUENCY_TASK_PRI        6
-#define OTA_TASK_PRI            6
-#define CREAT_TASK_PRI           5
-#define TEST_TASK_PRI    5
-#define CONTROL_TASK_PRI        5
-#define CAN_RECIEVE_TASK_PRI        6
-#define TCP_RECIEVE_TASK_PRI          5
-#define QRCODE_PARSE_SEND_TASK_PRI        5
-#define SEND_CURRENT_TASK_PRI       6
-#define MCPWM_SERVO_CONTROL_TASK_PRI      5
-#define UART_RECIEVE_TASK_PRI             5
-#define QR_CODE_INFO_TASK_PRI         5
-#define REMOTE_CONTROL_TASK_PRI       5
+#define SLOW_FREQUENCY_TASK_PRI   6
+#define FAST_FREQUENCY_TASK_PRI   6
+#define OTA_TASK_PRI              6
+#define CREAT_TASK_PRI            5
+#define TEST_TASK_PRI             5
+#define CONTROL_TASK_PRI          5
+#define CAN_RECIEVE_TASK_PRI      6
+#define TCP_RECIEVE_TASK_PRI      5
+#define QRCODE_PARSE_SEND_TASK_PRI   5
+#define SEND_CURRENT_TASK_PRI        6
+#define MCPWM_SERVO_CONTROL_TASK_PRI 5
+#define UART_RECIEVE_TASK_PRI        5
+#define QR_CODE_INFO_TASK_PRI        5
+#define REMOTE_CONTROL_TASK_PRI      5
 ```
 
 ## 小车底盘驱动
