@@ -315,6 +315,50 @@ typedef struct Remote_t
 
 ## CAN驱动
 
+项目中主要通过CAN总线与电子调速器通信，从而通过电流值控制电机转速，同时开发板也可以通过CAN总线接收到电机发送过来的数据帧，包含电机实时转速、电流、单圈绝对位置信息，可以通过这些反馈信息对电机进行PID速度环、位置环控制。
+
+#### CAN初始化
+
+```c
+can_general_config_t g_config = CAN_GENERAL_CONFIG_DEFAULT(GPIO_NUM_14, GPIO_NUM_15,CAN_MODE_NORMAL);
+can_timing_config_t t_config = CAN_TIMING_CONFIG_1MBITS();
+can_filter_config_t f_config = CAN_FILTER_CONFIG_ACCEPT_ALL();
+
+//Install can driver
+can_driver_install(&g_config, &t_config, &f_config);
+can_start() ;
+```
+
+配置CAN控制器为正常模式，时序配置为1MBITS
+
+#### 接线
+
+开发板的GPIO_14、GPIO_15分别配置为CAN控制器的Tx、Rx，连接到外部CAN收发器的Tx、Rx。
+
+本项目用到的动力系统为RoboMaster M2006电机
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ----------------------------
