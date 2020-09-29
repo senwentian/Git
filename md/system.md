@@ -329,21 +329,153 @@ can_driver_install(&g_config, &t_config, &f_config);
 can_start() ;
 ```
 
-配置CAN控制器为正常模式，时序配置为1MBITS
+配置CAN控制器为正常模式，CAN总线比特率为1Mbps
 
 #### 接线
 
+![motor](_static\motor.png)
+
 开发板的GPIO_14、GPIO_15分别配置为CAN控制器的Tx、Rx，连接到外部CAN收发器的Tx、Rx。
 
-本项目用到的动力系统为RoboMaster M2006电机
+本项目用到的动力系统为RoboMaster M2006电机（以下简称M2006电机）和C610无刷电机调速器（C610电调）
+
+##### M2006电机供电
+
+24V 6s锂电池通过电调中心板分出四路24v电压供给四个电机
+
+##### CAN总线通信
+
+- 四个电调上引出的CAN_H、CAN_L以及外部CAN收发器的CAN_H、CAN_L分别连接至电调中心板上进行通信
+
+- 每个电调和开发板都相当于CAN网络上的一个节点，都可以进行收发数据帧
+- 每个电调都具有提前标定好且唯一的ID，用于接收开发板发送的控制指令来进行控制电流输出
+
+>开发板通过向CAN网络上发送数据帧来控制电机转速
+>
+>电调通过CAN网络发送电机反馈信息给开发板
+
+#### CAN通信协议
+
+1、电调接收报文格式
+
+用于向电调发送控制指令控制电调的电流输出，两个标识符（0x200和0x1FF）各自对应控制4个ID的电调。控制转矩电流值范围-10000~0~10000，对应电调输出的转矩电流范围-10~0~10A
+
+标识符：0x200        帧格式：DATA
+
+帧类型：标准帧        DLC：8字节
+
+| 数据域  | 内容            | 电调ID |
+| ------- | --------------- | ------ |
+| DATA[0] | 控制电流值高8位 | 1      |
+| DATA[1] | 控制电流值低8位 | 1      |
+| DATA[2] | 控制电流值高8位 | 2      |
+| DATA[3] | 控制电流值低8位 | 2      |
+| DATA[4] | 控制电流值高8位 | 3      |
+| DATA[5] | 控制电流值低8位 | 3      |
+| DATA[6] | 控制电流值高8位 | 4      |
+| DATA[7] | 控制电流值低8位 | 4      |
+
+标识符：0x1FF        帧格式：DATA
+
+帧类型：标准帧        DLC：8字节
+
+| 数据域  | 内容            | 电调ID |
+| ------- | --------------- | ------ |
+| DATA[0] | 控制电流值高8位 | 5      |
+| DATA[1] | 控制电流值低8位 | 5      |
+| DATA[2] | 控制电流值高8位 | 6      |
+| DATA[3] | 控制电流值低8位 | 6      |
+| DATA[4] | 控制电流值高8位 | 7      |
+| DATA[5] | 控制电流值低8位 | 7      |
+| DATA[6] | 控制电流值高8位 | 8      |
+| DATA[7] | 控制电流值低8位 | 8      |
+
+```c
+void C610_SendCurrentVal(int16_t I1, int16_t I2, int16_t I3, int16_t I4)
+{
+	int16_t Current_1 = I1;
+	int16_t Current_2 = I2;
+	int16_t Current_3 = I3;
+	int16_t Current_4 = I4;
+	can_message_t message;
+	message.flags = CAN_MSG_FLAG_NONE;
+	message.identifier = 0x200;
+  	message.data_length_code = 0x08;
+    message.data[0] = (Current_1 >> 8);
+    message.data[1] = Current_1;
+    message.data[2] = (Current_2 >> 8);
+    message.data[3] = Current_2;
+    message.data[4] = (Current_3 >> 8);
+    message.data[5] = Current_3;
+    message.data[6] = (Current_4 >> 8);
+    message.data[7] = Current_4;
+	can_transmit(&message, portMAX_DELAY);
+}
+```
 
 
 
+2、电调反馈报文格式
 
+电调向总线上发送的反馈数据
 
+标识符：0x200 + 电调ID（如：ID为1，该标识符为0x201）
 
+帧格式：DATA
 
+帧类型：标准帧
 
+DLC：8字节
+
+| 数据域  | 内容              |
+| ------- | ----------------- |
+| DATA[0] | 转子机械角度高8位 |
+| DATA[1] | 转子机械角度低8位 |
+| DATA[2] | 转子转速高8位     |
+| DATA[3] | 转子转速低8位     |
+| DATA[4] | 实际输出转矩高8位 |
+| DATA[5] | 实际输出转矩低8位 |
+| DATA[6] | NULL              |
+| DATA[7] | NULL              |
+
+发送频率：1KHz
+
+转子机械角度值范围：0 ~ 8191（对应转子机械角度为0 ~ 360°）
+
+转子转速值的单位为：rpm
+
+```c
+void C610_GetMotorInfo(can_message_t* RxMsg)
+{
+	uint8_t ESC_Id = RxMsg ->identifier - ESC_BaseID;
+	uint16_t LastPulse;
+	int16_t DeltaPulse;
+	if(ValueInRange_u(ESC_Id, 0, 3)){
+		LastPulse = MotorInfo[ESC_Id].AnglePulse;
+		MotorInfo[ESC_Id].AnglePulse = (uint16_t)(RxMsg -> data[0] << 8 | RxMsg -> data[1]);
+		MotorInfo[ESC_Id].Velocity	 = (int16_t)(RxMsg -> data[2] << 8 | RxMsg -> data[3]);
+		MotorInfo[ESC_Id].Current	 = (int16_t)(RxMsg -> data[4] << 8 | RxMsg -> data[5]);=
+		DeltaPulse = MotorInfo[ESC_Id].AnglePulse - LastPulse;
+		if(DeltaPulse > 4095)
+			DeltaPulse -= 8192;
+		else if(DeltaPulse < -4096)
+			DeltaPulse += 8192;
+		MotorInfo[ESC_Id].Position += DeltaPulse;
+	}
+}
+```
+
+通过CAN总线接收到电调发送的数据帧之后通过C610_GetMotorInfo() API解析反馈信息并保存在结构体中
+
+```c
+typedef struct MotoInfo_t
+{
+	uint16_t	AnglePulse;
+	int16_t		Velocity;
+	int16_t		Current;
+	int32_t		Position;
+}MotoInfo_t;
+```
 
 
 

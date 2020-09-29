@@ -64,61 +64,61 @@ git clone ssh://git@glab.espressif.cn:8266/intern-porjects/esp-intelligent-vehic
 **代码文件结构如下所示：![intelligent-vehicle_file_structure](_static/intelligent-vehicle_file_structure.png)**
 
 ```c
-├── External components                              | 外部项目组件目录
-│   ├── esp32-camera                                     | camera组件
-│   │   ├── conversions                                  | 帧格式转换组件 
-│   │   ├── driver                                               | camera驱动组件 
-│   │   └── sensors                                            | 图像传感器组件
-│   ├── fb_gfx                                                      | 
-│   ├──  qrcode-generator                              | QR码生成器库
-│   ├──  qrcode-recognition                           | QR码解析
-│   │   ├── qifi-parser                                       | Wi-Fi二维码解析代码 
-│   │   └── quirc                                                  | QR码提取解析库
-├── components                                                 | 项目组件目录
-│   ├── user_config                                            | 系统 task 配置
+├── External components               | 外部项目组件目录
+│   ├── esp32-camera                  | camera组件
+│   │   ├── conversions               | 帧格式转换组件 
+│   │   ├── driver                    | camera驱动组件 
+│   │   └── sensors                   | 图像传感器组件
+│   ├── fb_gfx                        | 
+│   ├──  qrcode-generator             | QR码生成器库
+│   ├──  qrcode-recognition           | QR码解析
+│   │   ├── qifi-parser               | Wi-Fi二维码解析代码 
+│   │   └── quirc                     | QR码提取解析库
+├── components                        | 项目组件目录
+│   ├── user_config                   | 系统 task 配置
 │   │   └── include
-│   ├── drive-control                                         | 底盘驱动目录
-│   │   ├── user_control                                  | 遥控器控制底盘运动
-│   │   ├── user_math                                      | 基本数学函数
-│   │   ├── user_motor                                    | 电机驱动及接收反馈
-│   │   ├── user_pid                                          | PID反馈调节
-│   │   ├── user_remote                                  | 转换遥控器通道值
-│   │   ├── user_sbus                                       | 解码sbus协议
-│   │   └── user_send_current                     | 驱动电机
-│   ├──  QR-Code                                                | 二维码目录
-│   │   ├── user_qrcode_info                        | 解析二维码数据命令
-│   │   ├── user_qrcode_task                       | 解析二维码数据任务
-│   │   ├── user_qrcode_wifi                        |  解析Wi-Fi二维码
-│   │   └── user_qrcode_wifi_task             |  解析Wi-Fi二维码任务
-│   ├──  Peripherals                                           | 外设目录
-│   │   ├── user_init                                          | 外设初始化
-│   │   ├── user_button                                   | 按键配置，用于OTA和erase-flash
-│   │   ├── user_can                                         |  CAN驱动，用于驱动电机
-│   │   ├── user_pwm                                      |  PWM配置，用于驱动舵机
-│   │   └── user_uart                                        |  UART配置，用于接收遥控器数据
-│   ├── httpd-mdns                                           | 
-│   │   ├── user_httpd                                     | 
-│   │   └── user_mdns                                     | 
-│   ├── TCP                                                            | TCP目录
-│   │   ├── user_TCP                                        | TCP初始化、接收数据、发送数据
-│   │   └── user_TCP_Rev_Parse                | 解析命令并执行操作
-│   ├── camera                                                    | 摄像头目录
-│   │   └── user_camera                                 | 摄像头初始化，用于扫描二维码和视频监控
-│   ├── OTA                                                           | OTA目录
-│   │   └── user_ota                                          | OTA任务配置，短按按键开启OTA
-│   └── Wi-Fi                                                         | Wi-Fi目录
-│          └── user_wifi                                         | Wi-Fi驱动，用于通信
-├── main                                                            
-│   ├── www                                                        | 视频监控html
-│   ├── server_certs                                         | 放置自签名证书、密钥和固件
-│   │   ├── ca_cert.pem                                 | 证书
-│   │   ├── ca_key.pem                                  | 密钥
-│   │   └── xxxx.bin                                          | 将要通过OTA升级的固件
-│   ├── app_main                                             | 入口函数
-│   └── Kconfig.projbuild                              | 定义组件配置信息的选项规则
-├── Makefile                                                        | 工具函数
-├── README.md                                                | 项目说明
-└── sdkconfig.defaults                                   | 默认参数
+│   ├── drive-control                 | 底盘驱动目录
+│   │   ├── user_control              | 遥控器控制底盘运动
+│   │   ├── user_math                 | 基本数学函数
+│   │   ├── user_motor                | 电机驱动及接收反馈
+│   │   ├── user_pid                  | PID反馈调节
+│   │   ├── user_remote               | 转换遥控器通道值
+│   │   ├── user_sbus                 | 解码sbus协议
+│   │   └── user_send_current         | 驱动电机
+│   ├──  QR-Code                      | 二维码目录
+│   │   ├── user_qrcode_info          | 解析二维码数据命令
+│   │   ├── user_qrcode_task          | 解析二维码数据任务
+│   │   ├── user_qrcode_wifi          |  解析Wi-Fi二维码
+│   │   └── user_qrcode_wifi_task     |  解析Wi-Fi二维码任务
+│   ├──  Peripherals                  | 外设目录
+│   │   ├── user_init                 | 外设初始化
+│   │   ├── user_button               | 按键配置，用于OTA和erase-flash
+│   │   ├── user_can                  |  CAN驱动，用于驱动电机
+│   │   ├── user_pwm                  |  PWM配置，用于驱动舵机
+│   │   └── user_uart                 |  UART配置，用于接收遥控器数据
+│   ├── httpd-mdns                    | 
+│   │   ├── user_httpd                | 
+│   │   └── user_mdns                 | 
+│   ├── TCP| TCP目录
+│   │   ├── user_TCP                  | TCP初始化、接收数据、发送数据
+│   │   └── user_TCP_Rev_Parse        | 解析命令并执行操作
+│   ├── camera                        | 摄像头目录
+│   │   └── user_camera               | 摄像头初始化，用于扫描二维码和视频监控
+│   ├── OTA| OTA目录
+│   │   └── user_ota                  | OTA任务配置，短按按键开启OTA
+│   └── Wi-Fi| Wi-Fi目录
+│          └── user_wifi              | Wi-Fi驱动，用于通信
+├── main
+│   ├── www                           | 视频监控html
+│   ├── server_certs                  | 放置自签名证书、密钥和固件
+│   │   ├── ca_cert.pem               | 证书
+│   │   ├── ca_key.pem                | 密钥
+│   │   └── xxxx.bin                  | 将要通过OTA升级的固件
+│   ├── app_main                      | 入口函数
+│   └── Kconfig.projbuild             | 定义组件配置信息的选项规则
+├── Makefile                          | 工具函数
+├── README.md                         | 项目说明
+└── sdkconfig.defaults                | 默认参数
 ```
 
 **详情可查阅**：[esp-intelligent-vehicle_file_structure](./_static/pdf/ESP-Intelligent-Vehicle.pdf)。
