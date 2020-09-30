@@ -25,7 +25,19 @@ ESP-Intelligent-Vehicle 是乐鑫推出的基于 ESP32 开发的wifi智能小车
 开发板介绍
 -----------
 
-本项目使用的是 ESP-WROVER-KIT-VB。
+本项目使用的是 ESP-WROVER-KIT-V4.1。
+
+![开发板正面](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/_images/esp-wrover-kit-v3-layout-front.jpg)
+
+```txt
+ ESP-WROVER-KIT-V4.1正面
+```
+
+![开发板反面](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/_images/esp-wrover-kit-v3-layout-back.jpg)
+
+```
+ESP-WROVER-KIT-V4.1反面
+```
 
 
 
@@ -69,7 +81,7 @@ ESP-IDF 是乐鑫为 ESP32 提供的物联网开发框架。
 
 ### 设置 ESP-IDF
 
-请参照 `ESP-IDF 入门指南 <https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.0/get-started/index.html>`_，按照步骤设置 ESP-IDF。注：请完成链接页面的所有步骤。
+请参照 [ESP-IDF 入门指南](<https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.0/get-started/index.html>) ，按照步骤设置 ESP-IDF。注：请完成链接页面的所有步骤。
 
 在进行下面步骤之前，请确认您已经正确设置了开发主机，并按照上面链接中的步骤构建了第一个应用程序。如果上面步骤已经完成，那让我们继续探索 ESP-IDF。
 
@@ -92,7 +104,7 @@ ESP-IDF 中的所有软件均以“组件”的形式提供，比如操作系统
 
 ![app_structure](_static/app_structure.png)
 
-​                                                                                                                       应用程序架构
+​                                                                   应用程序架构
 
 - `CMakeLists.txt` 和 `Makefile` 文件，用于控制工程的编译过程。
 - `components` 文件夹，包含该项目的组件文件夹。
@@ -104,7 +116,7 @@ ESP-IDF 中的所有软件均以“组件”的形式提供，比如操作系统
 - `build` 文件夹，存放编译输出的文件。
 - `sdkconfig` 文件，定义项目的所有配置。这个文件无需手动修改，编译时会自动从你在 menuconfig 中的设置来更新该文件。
 
-> 更多关于工程结构和编译过程的细节，请参阅 编程指南/构建系统 <https://docs.espressif.com/projects/esp-idf/zh_CN/v4.0/api-guides/build-system.html#component-directories>_。
+> 更多关于工程结构和编译过程的细节，请参阅 [编程指南/构建系统](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.0/api-guides/build-system.html#component-directories) 。
 
 
 

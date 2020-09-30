@@ -1,12 +1,12 @@
 **9月29日总结**
 
-前几天晚上抽时间将一个简单的机械臂做完了，因为晚上时间和马上要进行的机器人比赛有一点冲突，可能做的比较粗糙，只有两个自由度
+1.前几天晚上抽时间将一个简单的机械臂做完了，因为晚上时间和马上要进行的机器人比赛有一点冲突，可能做的比较粗糙，只有两个自由度
 
 今天早上带过来进行了调试，搬运和放下动作都已经修改完成
 
-之后继续完善system文档，预计明天再将摄像头和TCP控制命令文档方面写完
+2.继续完善system文档，预计明天再将摄像头和TCP控制命令文档方面写完
 
-准备最近再抽时间用3D打印机给开发板做个支撑件放在车上
+3.准备最近再抽时间用3D打印机给开发板做个支撑件放在车上
 
 # 智能小车系统
 
@@ -107,20 +107,6 @@ TASK 具体描述如下：
 #define REMOTE_CONTROL_TASK_PRI      5
 ```
 
-## 小车底盘驱动
-
-小车底盘驱动代码，可以在 `components\drivers` 中查阅。该组件将驱动程序按照功能进行分类，包括 `user_control`、`user_motor`、`user_remote` 等。
-
-![drive-control](_static/drive-control.png)
-
-
-
-## 摄像头驱动
-
-ESP-Intelligent-Vehicle进行二维码识别以及视频同步均要用到摄像头的组件，所用到的摄像头组件来源于[esp32-camera](https://github.com/espressif/esp32-camera)
-
-其提供了适用于OV2640，OV3660，OV5640和OV7725图像传感器的ESP32驱动程序。同时，它还提供了一些工具，可以将其帧数据转换为更常见的BMP和JPEG格式。
-
 
 
 ## 舵机驱动
@@ -211,15 +197,19 @@ while (1){
     }
 ```
 
-
-
 当然，当接收到TCP Client发过来的命令`pickup:`、`putdown:`时，TCP命令控制任务也会调用上述的货物搬运动作进行执行。
+
+PWM控制舵机动作具体代码请参考`components\Peripherals\user_pwm.c`
 
 
 
 ## UART驱动
 
 项目中主要通过UART来接收遥控器数据
+
+#### 接线
+
+将接收机的SBUS信号线通过反相器连接在GPIO_13
 
 #### UART初始化
 
@@ -238,10 +228,6 @@ while (1){
 ```
 
 配置UART波特率为100000，八位数据位，偶校验，两位停止位，无硬件流控
-
-#### 接线
-
-将接收机的SBUS信号线通过反相器连接在GPIO_13
 
 #### 接受数据
 
@@ -327,20 +313,6 @@ typedef struct Remote_t
 
 项目中主要通过CAN总线与电子调速器通信，从而通过电流值控制电机转速，同时开发板也可以通过CAN总线接收到电机发送过来的数据帧，包含电机实时转速、电流、单圈绝对位置信息，可以通过这些反馈信息对电机进行PID速度环、位置环控制。
 
-#### CAN初始化
-
-```c
-can_general_config_t g_config = CAN_GENERAL_CONFIG_DEFAULT(GPIO_NUM_14, GPIO_NUM_15,CAN_MODE_NORMAL);
-can_timing_config_t t_config = CAN_TIMING_CONFIG_1MBITS();
-can_filter_config_t f_config = CAN_FILTER_CONFIG_ACCEPT_ALL();
-
-//Install can driver
-can_driver_install(&g_config, &t_config, &f_config);
-can_start() ;
-```
-
-配置CAN控制器为正常模式，CAN总线比特率为1Mbps
-
 #### 接线
 
 ![motor](_static\motor.png)
@@ -363,6 +335,20 @@ can_start() ;
 >开发板通过向CAN网络上发送数据帧来控制电机转速
 >
 >电调通过CAN网络发送电机反馈信息给开发板
+
+#### CAN初始化
+
+```c
+can_general_config_t g_config = CAN_GENERAL_CONFIG_DEFAULT(GPIO_NUM_14, GPIO_NUM_15,CAN_MODE_NORMAL);
+can_timing_config_t t_config = CAN_TIMING_CONFIG_1MBITS();
+can_filter_config_t f_config = CAN_FILTER_CONFIG_ACCEPT_ALL();
+
+//Install can driver
+can_driver_install(&g_config, &t_config, &f_config);
+can_start() ;
+```
+
+配置CAN控制器为正常模式，CAN总线比特率为1Mbps
 
 #### CAN通信协议
 
@@ -464,7 +450,7 @@ void C610_GetMotorInfo(can_message_t* RxMsg)
 		LastPulse = MotorInfo[ESC_Id].AnglePulse;
 		MotorInfo[ESC_Id].AnglePulse = (uint16_t)(RxMsg -> data[0] << 8 | RxMsg -> data[1]);
 		MotorInfo[ESC_Id].Velocity	 = (int16_t)(RxMsg -> data[2] << 8 | RxMsg -> data[3]);
-		MotorInfo[ESC_Id].Current	 = (int16_t)(RxMsg -> data[4] << 8 | RxMsg -> data[5]);=
+		MotorInfo[ESC_Id].Current	 = (int16_t)(RxMsg -> data[4] << 8 | RxMsg -> data[5]);
 		DeltaPulse = MotorInfo[ESC_Id].AnglePulse - LastPulse;
 		if(DeltaPulse > 4095)
 			DeltaPulse -= 8192;
@@ -487,7 +473,205 @@ typedef struct MotoInfo_t
 }MotoInfo_t;
 ```
 
+  
 
+## LED驱动
+
+本项目中所用到的LED主要为了指示wifi是否连接成功以及TCP是否连接成功
+
+当系统开始运行时，如果Flash中存有已连接Wi-Fi的信息，开发板会尝试连接该Wi-Fi，同时**LED_GREEN熄灭**
+
+如果系统开始运行后，**LED_GREEN慢闪**，说明摄像头开始启动，正在不断捕获二维码图像，此时用户需将Wi-Fi二维码放置在摄像头10 ~ 20cm前，摄像头识别到二维码并解析后尝试连接该Wi-Fi
+
+待开发板连接到Wi-Fi之后，**LED_GREEN快闪**，此时用户需启动TCP Client来进行TCP连接，可输入如下命令
+
+```
+nc 192.168.0.162 3333
+```
+
+IP地址为开发板连接Wi-Fi之后被分配到的IP，端口号默认为3333，端口号可以通过`menuconfig->Intelligent Vehicle Configuration->TCP->port`进行修改
+
+
+
+## Button
+
+ESP-WROVER-KIT-V4.1开发板上有两个实体按键，其中EN作为复位开发板按键使用，通过程序可配置Boot按键功能
+
+#### 初始化
+
+```c
+static void button_press_3sec_cb(void *arg)
+{
+    ESP_LOGW("Project", "Restore factory settings");
+    nvs_flash_erase();
+    esp_restart();
+}
+
+static void button_press_cb(void *arg)
+{
+    ESP_LOGW("Project", "Start firmware upgrade");
+    OTA_flag = 1;
+}
+
+static void configure_push_button(int gpio_num, void (*btn_cb)(void *))
+{
+    button_handle_t btn_handle = iot_button_create(gpio_num, 0);
+
+    if (btn_handle) {
+        iot_button_set_evt_cb(btn_handle, BUTTON_CB_TAP, button_press_cb, NULL);
+        iot_button_add_on_press_cb(btn_handle, 3, button_press_3sec_cb, NULL);
+    }
+}
+```
+
+Button在TCP连接之前进行初始化，短按Boot按钮可以进行OTA升级，长按3秒Boot按钮可以擦除Flash，擦除Flash之后，系统下次重启需要重新扫描二维码进行配网。
+
+具体有关OTA方面的讲解，请参考[固件升级](Firmware upgrade.md)
+
+
+
+## 视频同步
+
+在`menuconfig->Intelligent Vehicle Configuration->Example Configuration->video sync`选择`1`即可打开视频同步功能
+
+在固件开始运行后，位于同一个局域网之内的PC端打开浏览器并将其指向`http://[ip-of-esp32]/`，通过网页中的`Get Still`和`Get Stream`两个按钮来捕获图像或者视频流。
+
+![vdieo_sync](_static\vdieo_sync.png)
+
+```c
+#include "esp_camera.h"
+#include "esp_http_server.h"
+#include "esp_timer.h"
+
+#define PART_BOUNDARY "123456789000000000000987654321"
+static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
+static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
+static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
+
+esp_err_t jpg_stream_httpd_handler(httpd_req_t *req){
+    camera_fb_t * fb = NULL;
+    esp_err_t res = ESP_OK;
+    size_t _jpg_buf_len;
+    uint8_t * _jpg_buf;
+    char * part_buf[64];
+    static int64_t last_frame = 0;
+    if(!last_frame) {
+        last_frame = esp_timer_get_time();
+    }
+
+    res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
+    if(res != ESP_OK){
+        return res;
+    }
+
+    while(true){
+        fb = esp_camera_fb_get();
+        if (!fb) {
+            ESP_LOGE(TAG, "Camera capture failed");
+            res = ESP_FAIL;
+            break;
+        }
+        if(fb->format != PIXFORMAT_JPEG){
+            bool jpeg_converted = frame2jpg(fb, 80, &_jpg_buf, &_jpg_buf_len);
+            if(!jpeg_converted){
+                ESP_LOGE(TAG, "JPEG compression failed");
+                esp_camera_fb_return(fb);
+                res = ESP_FAIL;
+            }
+        } else {
+            _jpg_buf_len = fb->len;
+            _jpg_buf = fb->buf;
+        }
+
+        if(res == ESP_OK){
+            res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
+        }
+        if(res == ESP_OK){
+            size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, _jpg_buf_len);
+            res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
+        }
+        if(res == ESP_OK){
+            res = httpd_resp_send_chunk(req, (const char *)_jpg_buf, _jpg_buf_len);
+        }
+        if(fb->format != PIXFORMAT_JPEG){
+            free(_jpg_buf);
+        }
+        esp_camera_fb_return(fb);
+        if(res != ESP_OK){
+            break;
+        }
+        int64_t fr_end = esp_timer_get_time();
+        int64_t frame_time = fr_end - last_frame;
+        last_frame = fr_end;
+        frame_time /= 1000;
+        ESP_LOGI(TAG, "MJPG: %uKB %ums (%.1ffps)",
+            (uint32_t)(_jpg_buf_len/1024),
+            (uint32_t)frame_time, 1000.0 / (uint32_t)frame_time);
+    }
+
+    last_frame = 0;
+    return res;
+}
+BMP HTTP Capture
+#include "esp_camera.h"
+#include "esp_http_server.h"
+#include "esp_timer.h"
+
+esp_err_t bmp_httpd_handler(httpd_req_t *req){
+    camera_fb_t * fb = NULL;
+    esp_err_t res = ESP_OK;
+    int64_t fr_start = esp_timer_get_time();
+
+    fb = esp_camera_fb_get();
+    if (!fb) {
+        ESP_LOGE(TAG, "Camera capture failed");
+        httpd_resp_send_500(req);
+        return ESP_FAIL;
+    }
+
+    uint8_t * buf = NULL;
+    size_t buf_len = 0;
+    bool converted = frame2bmp(fb, &buf, &buf_len);
+    esp_camera_fb_return(fb);
+    if(!converted){
+        ESP_LOGE(TAG, "BMP conversion failed");
+        httpd_resp_send_500(req);
+        return ESP_FAIL;
+    }
+
+    res = httpd_resp_set_type(req, "image/x-windows-bmp")
+       || httpd_resp_set_hdr(req, "Content-Disposition", "inline; filename=capture.bmp")
+       || httpd_resp_send(req, (const char *)buf, buf_len);
+    free(buf);
+    int64_t fr_end = esp_timer_get_time();
+    ESP_LOGI(TAG, "BMP: %uKB %ums", (uint32_t)(buf_len/1024), (uint32_t)((fr_end - fr_start)/1000));
+    return res;
+}
+```
+
+具体代码实现请参考`components\httpd-mdns\user_httpd.c`和`components\httpd-mdns\user_mdns.c`
+
+
+
+
+
+
+
+
+
+## 小车底盘驱动
+
+小车底盘驱动代码，可以在 `components\drivers` 中查阅。该组件将驱动程序按照功能进行分类，包括 `user_control`、`user_motor`、`user_remote` 等。
+
+![drive-control](_static/drive-control.png)
+
+
+
+## 摄像头驱动
+
+ESP-Intelligent-Vehicle进行二维码识别以及视频同步均要用到摄像头的组件，所用到的摄像头组件来源于[esp32-camera](https://github.com/espressif/esp32-camera)
+
+其提供了适用于OV2640，OV3660，OV5640和OV7725图像传感器的ESP32驱动程序。同时，它还提供了一些工具，可以将其帧数据转换为更常见的BMP和JPEG格式。
 
 
 
