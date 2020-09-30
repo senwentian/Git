@@ -123,7 +123,7 @@ esp_err_t qifi_parser_parse(qifi_parser_t *parser, const char *buf, size_t bufle
 
 
 
-# 二维码位置信息识别
+# 二维码位置信息识别并上报
 
 待进行TCP连接之后，系统所有任务开始运行，其中较为关键的就是二维码识别任务，该任务不断进行捕获图像扫描二维码，大概200ms捕获一次，捕获解析流程跟上文二维码扫描配网流程类似，待获得二维码中含有的字符串信息之后，通过QR-code-data()函数将该特定格式的字符串解析出单独的内容存放入QR_Code_Info_t结构体中。
 
@@ -218,15 +218,16 @@ static void QR_code_data(const struct quirc_data *data)
 
 具体QR-code-data()解析代码可以参考`components\QR-Code\user_qrcode_info.c`
 
-![二维码](_static\二维码.png)
+待扫描二维码状态被设置为QR_QIFI_STRING_PARSE_OK，即说明解析成功，通过sprintf函数格式化字符串到一个字符串数组，通过socket连接发送给TCP Clinet
 
-​	
+格式化字符串函数具体可参考`components\TCP\user_TCP.c`.
+
+![二维码](_static\QRcode.png)
+
+摄像头可以通过扫描如上格式的二维码信息并解析出单独信息通过TCP发送给客户端，下图为PC端TCP Client收到的消息
+
+![Data reporting](_static\Data reporting.png)
 
 
 
-
-
-
-
-# 位置信息上报
-
+# 
