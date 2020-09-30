@@ -228,6 +228,3 @@ static void QR_code_data(const struct quirc_data *data)
 
 ![Data reporting](_static\Data reporting.png)
 
-
-
-# 

@@ -655,10 +655,6 @@ esp_err_t bmp_httpd_handler(httpd_req_t *req){
 
 
 
-
-
-
-
 ## 小车底盘驱动
 
 小车底盘驱动代码，可以在 `components\drivers` 中查阅。该组件将驱动程序按照功能进行分类，包括 `user_control`、`user_motor`、`user_remote` 等。
@@ -680,13 +676,3 @@ ESP-Intelligent-Vehicle进行二维码识别以及视频同步均要用到摄像
 
 
 
-
-
-
-
-
-
-
-----------------------------
-
-未完待续
